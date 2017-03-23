@@ -590,33 +590,33 @@ namespace Nez.Console
 
 			// this will get us the current executables assembly in 99.9% of cases
 			// for now we will let the next section handle loading this. If it doesnt work out we'll uncomment this
-			//processAssembly( Core._instance.GetType().GetTypeInfo().Assembly );
+			processAssembly( Core._instance.GetType().GetTypeInfo().Assembly );
 
-			try
-			{
-				// this is a nasty hack that lets us get at all the assemblies. It is only allowed to exist because this will never get
-				// hit in a release build.
-				var appDomainType = typeof( string ).GetTypeInfo().Assembly.GetType( "System.AppDomain" );
-				var domain = appDomainType.GetRuntimeProperty( "CurrentDomain" ).GetMethod.Invoke( null, new object[]{} );
-				var assembliesMethod = ReflectionUtils.getMethodInfo( domain, "GetAssemblies" );
-				// not sure about arguments, detect in runtime
-				var methodCallParams = assembliesMethod.GetParameters().Length == 0 ? new object[] { } : new object[] { false };
-				var assemblies = assembliesMethod.Invoke( domain, methodCallParams ) as Assembly[];
+			//try
+			//{
+			//	// this is a nasty hack that lets us get at all the assemblies. It is only allowed to exist because this will never get
+			//	// hit in a release build.
+			//	var appDomainType = typeof( string ).GetTypeInfo().Assembly.GetType( "System.AppDomain" );
+			//	var domain = appDomainType.GetRuntimeProperty( "CurrentDomain" ).GetMethod.Invoke( null, new object[]{} );
+			//	var assembliesMethod = ReflectionUtils.getMethodInfo( domain, "GetAssemblies" );
+			//	// not sure about arguments, detect in runtime
+			//	var methodCallParams = assembliesMethod.GetParameters().Length == 0 ? new object[] { } : new object[] { false };
+			//	var assemblies = assembliesMethod.Invoke( domain, methodCallParams ) as Assembly[];
 
-				var ignoredAssemblies = new string[] { "mscorlib", "MonoMac", "MonoGame.Framework", "Mono.Security", "System", "OpenTK", "ObjCImplementations", "Nez" };
-				foreach( var assembly in assemblies )
-				{
-					var name = assembly.GetName().Name;
-					if( name.StartsWith( "System." ) || ignoredAssemblies.contains( name ) )
-						continue;
+			//	var ignoredAssemblies = new string[] { "mscorlib", "MonoMac", "MonoGame.Framework", "Mono.Security", "System", "OpenTK", "ObjCImplementations", "Nez" };
+			//	foreach( var assembly in assemblies )
+			//	{
+			//		var name = assembly.GetName().Name;
+			//		if( name.StartsWith( "System." ) || ignoredAssemblies.contains( name ) )
+			//			continue;
 
-					processAssembly( assembly );
-				}
-			}
-			catch( Exception e )
-			{
-				Debug.log( "DebugConsole pooped itself trying to get all the loaded assemblies. {0}", e );
-			}
+			//		processAssembly( assembly );
+			//	}
+			//}
+			//catch( Exception e )
+			//{
+			//	Debug.log( "DebugConsole pooped itself trying to get all the loaded assemblies. {0}", e );
+			//}
 
 
 			// Maintain the sorted command list
