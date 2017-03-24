@@ -86,6 +86,10 @@ namespace Nez.NormalMapGenerator
 
 			return textureContent;
 		}
+
+
+
+     
 	}
 }
 
