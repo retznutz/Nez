@@ -38,9 +38,13 @@ namespace Nez
 		// scene transitions
 		internal static byte[] squaresTransitionBytes { get { return getFileResourceBytes( "Content/nez/effects/transitions/Squares.mgfxo" ); } }
 
-		// sprite or post processor effects
-		internal static byte[] spriteEffectBytes { get { return getMonoGameEmbeddedResourceBytes("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"); } }
-		internal static byte[] multiTextureOverlayBytes { get { return getFileResourceBytes( "Content/nez/effects/MultiTextureOverlay.mgfxo" ); } }
+        // sprite or post processor effects
+        #if UWP
+                internal static byte[] spriteEffectBytes { get { return getMonoGameEmbeddedResourceBytes("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.dx11.mgfxo"); } }
+        #else
+                internal static byte[] spriteEffectBytes { get { return getMonoGameEmbeddedResourceBytes("Microsoft.Xna.Framework.Graphics.Effect.Resources.SpriteEffect.ogl.mgfxo"); } }
+        #endif
+        internal static byte[] multiTextureOverlayBytes { get { return getFileResourceBytes( "Content/nez/effects/MultiTextureOverlay.mgfxo" ); } }
 		internal static byte[] scanlinesBytes { get { return getFileResourceBytes( "Content/nez/effects/Scanlines.mgfxo" ); } }
 		internal static byte[] reflectionBytes { get { return getFileResourceBytes( "Content/nez/effects/Reflection.mgfxo" ); } }
 		internal static byte[] grayscaleBytes { get { return getFileResourceBytes( "Content/nez/effects/Grayscale.mgfxo" ); } }
@@ -69,9 +73,9 @@ namespace Nez
 
 		internal static byte[] getMonoGameEmbeddedResourceBytes( string name )
 		{
-			#if FNA
+#if FNA
 			name = name.Replace( ".ogl.mgfxo", ".fxb" );
-			#endif
+#endif
 
 			var assembly = ReflectionUtils.getAssembly( typeof( MathHelper ) );
 			using( var stream = assembly.GetManifestResourceStream( name ) )
@@ -93,9 +97,9 @@ namespace Nez
 		/// <param name="path">Path.</param>
 		public static byte[] getFileResourceBytes( string path )
 		{
-			#if FNA
+#if FNA
 			path = path.Replace( ".mgfxo", ".fxb" );
-			#endif
+#endif
 
 			byte[] bytes;
 			try

@@ -2,6 +2,8 @@
 
 [![Join the chat at https://gitter.im/Nez-Devs/Lobby](https://badges.gitter.im/Nez-Devs/Lobby.svg)](https://gitter.im/Nez-Devs/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
+** Nez is a great game framework and with Xbox Live Creator program starting up I wanted to try and make the needed changes to Nez to allow support on the Universal Windows Platform (UWP) for Xbox.  I'm attempting to make changes using only compiler symbols to make it easier to merge changes upstream from Nez (there will be some new files as well - shaders for sure)  **
+
 Nez aims to be a lightweight 2D framework that sits on top of MonoGame/FNA. It provides a solid base for you to build a 2D game on. Some of the many features it includes are:
 
 - Scene/Entity/Component system with Component render layer tracking and optional entity systems (an implementation that operates on a group of entities that share a specific set of components)

@@ -312,19 +312,21 @@ namespace Nez
 			if( !DebugConsole.instance.isOpen )
 				TimeRuler.instance.render();
 
-            #if !FNA
-            drawCalls = 3;// graphicsDevice.Metrics.DrawCount;
-			#endif
-			#endif
-		}
+            #if (!FNA && !UWP)
+                drawCalls = graphicsDevice.Metrics.DrawCount;
+            #elif (UWP)
+                drawCalls = 3;  // graphicsDevice.Metrics.DrawCount throws an error in UWP
+            #endif
+            #endif
+        }
 
-		#endregion
+        #endregion
 
 
-		/// <summary>
-		/// Called after a Scene ends, before the next Scene begins
-		/// </summary>
-		void onSceneChanged()
+        /// <summary>
+        /// Called after a Scene ends, before the next Scene begins
+        /// </summary>
+        void onSceneChanged()
 		{
 			emitter.emit( CoreEvents.SceneChanged );
 			Time.sceneChanged();
