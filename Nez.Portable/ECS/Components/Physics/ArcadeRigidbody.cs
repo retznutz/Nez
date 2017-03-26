@@ -176,10 +176,13 @@ namespace Nez
 
 			if( shouldUseGravity )
 				velocity += Physics.gravity * Time.deltaTime;
-			
-			entity.transform.position += velocity * Time.deltaTime;
 
-			CollisionResult collisionResult;
+            //reduce velocity by friction - not sure why this was missing??
+            velocity -= velocity * friction;
+
+            entity.transform.position += velocity * Time.deltaTime;
+
+            CollisionResult collisionResult;
 			// fetch anything that we might collide with at our new position
 			var neighbors = Physics.boxcastBroadphaseExcludingSelf( _collider, _collider.collidesWithLayers );
 			foreach( var neighbor in neighbors )
