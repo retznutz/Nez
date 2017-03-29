@@ -73,16 +73,16 @@ namespace Nez.ECS.Components
             camera.entity.transform.roundPosition();
 
 
-            //if (_entityRegion.top - 250 <= camera.bounds.top || _entityRegion.bottom + 250 >= camera.bounds.bottom || _entityRegion.left - 250 <= camera.bounds.left || _entityRegion.right + 250 >= camera.bounds.right)
-            //{
-            //    camera.zoomOut(0.1f);
-            //}
-            //else if (_entityRegion.top - 251 >= camera.bounds.top || _entityRegion.bottom + 251  <= camera.bounds.bottom || _entityRegion.left - 251 >= camera.bounds.left || _entityRegion.right + 251 <= camera.bounds.right)
-            //{
-            //    camera.zoomIn(0.1f);
-            //}
+            if (_entityRegion.top < camera.bounds.top || _entityRegion.bottom  > camera.bounds.bottom || _entityRegion.left  < camera.bounds.left || _entityRegion.right  > camera.bounds.right)
+            {
+                camera.zoomOut(0.01f);
+            }
+            else if (_entityRegion.top > camera.bounds.top || _entityRegion.bottom  < camera.bounds.bottom || _entityRegion.left  > camera.bounds.left || _entityRegion.right  < camera.bounds.right)
+            {
+                camera.zoomIn(0.01f);
+            }
 
-            
+
 
 
             //    if (_entityRegion.left < camera.bounds.left || _entityRegion.right > camera.bounds.right)
@@ -94,16 +94,17 @@ namespace Nez.ECS.Components
             //    camera.zoomIn(0.005f);
             //}
 
-            if (_entityRegion.width > _entityRegion.height)
-            {
-                camera.rawZoom = 1 - _entityRegion.width * .001f;
-            }else
-            {
-                camera.rawZoom = 1 - _entityRegion.height * .001f;
-            }
+            //if (_entityRegion.width > _entityRegion.height)
+            //{
+            //    camera.zoom = -(_entityRegion.width / camera.bounds.width);
+            //}
+            //else
+            //{
+            //    camera.zoom = -(_entityRegion.height / camera.bounds.height);
+            //}
 
-            System.Diagnostics.Debug.WriteLine(camera.rawZoom);
-            
+            //System.Diagnostics.Debug.WriteLine(camera.rawZoom);
+          
             // camera.zoomOut(_currentZoom);
             //camera.
         }
