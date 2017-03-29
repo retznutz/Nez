@@ -35,6 +35,7 @@
     <Compile Include="Debug\Debug.cs" />
     <Compile Include="ECS\Camera.cs" />
     <Compile Include="ECS\Component.cs" />
+    <Compile Include="ECS\Components\FitCamera.cs" />
     <Compile Include="ECS\Entity.cs" />
     <Compile Include="ECS\Scene.cs" />
     <Compile Include="ECS\Components\Renderables\RenderableComponent.cs" />

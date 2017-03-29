@@ -183,8 +183,9 @@ namespace Nez
             entity.transform.position += velocity * Time.deltaTime;
 
             CollisionResult collisionResult;
-			// fetch anything that we might collide with at our new position
-			var neighbors = Physics.boxcastBroadphaseExcludingSelf( _collider, _collider.collidesWithLayers );
+            // fetch anything that we might collide with at our new position
+          
+            var neighbors = Physics.boxcastBroadphaseExcludingSelf( _collider, _collider.collidesWithLayers );
 			foreach( var neighbor in neighbors )
 			{
 				if( _collider.collidesWith( neighbor, out collisionResult ) )
