@@ -40,8 +40,8 @@ namespace Nez.ECS.Components
             if (camera == null)
             {
                 camera = entity.scene.camera;
-                //camera.minimumZoom = 3;
-                //camera.maximumZoom = 10;
+                camera.minimumZoom = 0.1f;
+                camera.maximumZoom = 3f;
             }
 
 
@@ -72,42 +72,30 @@ namespace Nez.ECS.Components
             camera.position = Vector2.Lerp(camera.position, camera.position + _desiredPositionDelta, followLerp);
             camera.entity.transform.roundPosition();
 
-
-            if (_entityRegion.top < camera.bounds.top || _entityRegion.bottom  > camera.bounds.bottom || _entityRegion.left  < camera.bounds.left || _entityRegion.right  > camera.bounds.right)
+            var widthDeltaPercent = _entityRegion.width / camera.bounds.width;
+            var heightDeltaPercent = _entityRegion.height / camera.bounds.height;
+            if (_entityRegion.width + 300 > camera.bounds.width & widthDeltaPercent > .4f)
             {
-                camera.zoomOut(0.01f);
+                camera.zoomOut(.006f);
             }
-            else if (_entityRegion.top > camera.bounds.top || _entityRegion.bottom  < camera.bounds.bottom || _entityRegion.left  > camera.bounds.left || _entityRegion.right  < camera.bounds.right)
+            else if (_entityRegion.width - 300 < camera.bounds.width && widthDeltaPercent < .6f)
             {
-                camera.zoomIn(0.01f);
+                camera.zoomIn(.006f);
             }
-
-
-
-
-            //    if (_entityRegion.left < camera.bounds.left || _entityRegion.right > camera.bounds.right)
+            //else if (_entityRegion.height + 300 > camera.bounds.height & heightDeltaPercent > .2f)
             //{
-            //    camera.zoomOut(0.005f);
+            //    camera.zoomOut(.006f);
             //}
-            //else if (_entityRegion.left > camera.bounds.left || _entityRegion.right  < camera.bounds.right)
+            //else if (_entityRegion.height - 300 < camera.bounds.height && heightDeltaPercent < .8f)
             //{
-            //    camera.zoomIn(0.005f);
+            //    camera.zoomIn(.006f);
             //}
 
-            //if (_entityRegion.width > _entityRegion.height)
-            //{
-            //    camera.zoom = -(_entityRegion.width / camera.bounds.width);
-            //}
-            //else
-            //{
-            //    camera.zoom = -(_entityRegion.height / camera.bounds.height);
-            //}
+            System.Diagnostics.Debug.WriteLine(camera.rawZoom);
 
-            //System.Diagnostics.Debug.WriteLine(camera.rawZoom);
-          
-            // camera.zoomOut(_currentZoom);
-            //camera.
+
         }
+       
 
 
 

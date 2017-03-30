@@ -34,6 +34,7 @@
   <ItemGroup>
     <Compile Include="Debug\Debug.cs" />
     <Compile Include="ECS\Camera.cs" />
+    <Compile Include="ECS\Components\CameraZoom.cs" />
     <Compile Include="ECS\Component.cs" />
     <Compile Include="ECS\Components\FitCamera.cs" />
     <Compile Include="ECS\Entity.cs" />
