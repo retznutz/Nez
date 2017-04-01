@@ -19,14 +19,18 @@ namespace Nez.ECS.Components
         RectangleF _worldSpaceDeadzone;
         public Vector2 focusOffset;
         RectangleF _entityRegion;
-        float _currentZoom = .1f;
+        float _minBoundary = 0;
+        float _maxBoundary = 0;
+
+
+        float zoomStep = .1f;
+        float zoomLerp = .05f;
+        float percentBoundary = .4f;
 
         public FitCamera(List<Entity> targetEntities, Camera camera)
         {
             _targetEntities = targetEntities;
             this.camera = camera;
-
-          
         }
 
 
@@ -42,12 +46,14 @@ namespace Nez.ECS.Components
                 camera = entity.scene.camera;
                 camera.minimumZoom = 0.1f;
                 camera.maximumZoom = 3f;
-            }
 
+                _minBoundary = 1.0f - percentBoundary;
+                _maxBoundary = 1.0f + percentBoundary;
+            }
 
             follow(_targetEntities);
 
-            // listen for changes in screen size so we can keep our deadzone properly positioned
+            // listen for changes in screen size
             Core.emitter.addObserver(CoreEvents.GraphicsDeviceReset, onGraphicsDeviceReset);
         }
 
@@ -61,8 +67,6 @@ namespace Nez.ECS.Components
 
         void IUpdatable.update()
         {
-            // translate the deadzone to be in world space
-
 
             _worldSpaceDeadzone.x = camera.position.X + focusOffset.X;
             _worldSpaceDeadzone.y = camera.position.Y + focusOffset.Y;
@@ -72,52 +76,40 @@ namespace Nez.ECS.Components
 
             camera.position = Vector2.Lerp(camera.position, camera.position + _desiredPositionDelta, followLerp);
             camera.entity.transform.roundPosition();
+
+
             var currentZoom = camera.zoom;
-
-
+           
+            //ccheck greater difference in width vs height
             if (_entityRegion.width > _entityRegion.height)
             {
                 //adjust width
-
-
-                if ((_entityRegion.width / camera.bounds.width) < .6f)
+                if ((_entityRegion.width / camera.bounds.width) < _minBoundary)
                 {
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + .005f, Time.deltaTime * 50f);
-                    //System.Diagnostics.Debug.WriteLine("in");
+                    //in
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + zoomStep, zoomLerp);
                 }
-                else if ((camera.bounds.width / _entityRegion.width) < 1.4f)
+                else if ((camera.bounds.width / _entityRegion.width) < _maxBoundary)
                 {
-
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - .005f, Time.deltaTime * 50f);
-                    // System.Diagnostics.Debug.WriteLine("out");
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - zoomStep, zoomLerp);
                 }
 
             }
             else if (_entityRegion.width < _entityRegion.height)
             {
                 //adjust height
-                if ((_entityRegion.height / camera.bounds.height) < .6f)
+                if ((_entityRegion.height / camera.bounds.height) < _minBoundary)
                 {
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + .005f, Time.deltaTime * 50f);
-                    // System.Diagnostics.Debug.WriteLine("in");
-
+                    //in
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + zoomStep, zoomLerp);
                 }
-                else if ((camera.bounds.height / _entityRegion.height) < 1.4f)
+                else if ((camera.bounds.height / _entityRegion.height) < _maxBoundary)
                 {
-
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - .005f, Time.deltaTime * 50f);
-                    //System.Diagnostics.Debug.WriteLine("out");
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - zoomStep, zoomLerp);
                 }
             }
-
-
-
-
-
         }
        
-
-
 
         void updateFollow()
         {
