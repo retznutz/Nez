@@ -63,6 +63,7 @@ namespace Nez.ECS.Components
         {
             // translate the deadzone to be in world space
 
+
             _worldSpaceDeadzone.x = camera.position.X + focusOffset.X;
             _worldSpaceDeadzone.y = camera.position.Y + focusOffset.Y;
 
@@ -71,27 +72,46 @@ namespace Nez.ECS.Components
 
             camera.position = Vector2.Lerp(camera.position, camera.position + _desiredPositionDelta, followLerp);
             camera.entity.transform.roundPosition();
+            var currentZoom = camera.zoom;
 
-            var widthDeltaPercent = _entityRegion.width / camera.bounds.width;
-            var heightDeltaPercent = _entityRegion.height / camera.bounds.height;
-            if (_entityRegion.width + 300 > camera.bounds.width & widthDeltaPercent > .4f)
-            {
-                camera.zoomOut(.006f);
-            }
-            else if (_entityRegion.width - 300 < camera.bounds.width && widthDeltaPercent < .6f)
-            {
-                camera.zoomIn(.006f);
-            }
-            //else if (_entityRegion.height + 300 > camera.bounds.height & heightDeltaPercent > .2f)
-            //{
-            //    camera.zoomOut(.006f);
-            //}
-            //else if (_entityRegion.height - 300 < camera.bounds.height && heightDeltaPercent < .8f)
-            //{
-            //    camera.zoomIn(.006f);
-            //}
 
-            System.Diagnostics.Debug.WriteLine(camera.rawZoom);
+            if (_entityRegion.width > _entityRegion.height)
+            {
+                //adjust width
+
+
+                if ((_entityRegion.width / camera.bounds.width) < .6f)
+                {
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + .005f, Time.deltaTime * 50f);
+                    //System.Diagnostics.Debug.WriteLine("in");
+                }
+                else if ((camera.bounds.width / _entityRegion.width) < 1.4f)
+                {
+
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - .005f, Time.deltaTime * 50f);
+                    // System.Diagnostics.Debug.WriteLine("out");
+                }
+
+            }
+            else if (_entityRegion.width < _entityRegion.height)
+            {
+                //adjust height
+                if ((_entityRegion.height / camera.bounds.height) < .6f)
+                {
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + .005f, Time.deltaTime * 50f);
+                    // System.Diagnostics.Debug.WriteLine("in");
+
+                }
+                else if ((camera.bounds.height / _entityRegion.height) < 1.4f)
+                {
+
+                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - .005f, Time.deltaTime * 50f);
+                    //System.Diagnostics.Debug.WriteLine("out");
+                }
+            }
+
+
+
 
 
         }
