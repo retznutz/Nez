@@ -80,15 +80,14 @@ namespace Nez.ECS.Components
 
 
             updateZoom(); //1-f^dt
-            camera.rawZoom = MathHelper.Lerp(camera.rawZoom, camera.rawZoom + _currentZoomTarget, Time.deltaTime * 5.5f);
+
+
+
+            System.Diagnostics.Debug.WriteLine(camera.zoom.ToString() + " : " + _currentZoomTarget.ToString() + " : " + MathHelper.Lerp(camera.zoom, _currentZoomTarget, Time.deltaTime * 5.5f).ToString());
+            camera.zoom = MathHelper.Lerp(camera.zoom, _currentZoomTarget, Time.deltaTime * 5.5f);
 
             
         }
-
-
-
-
-        float _delta = 0;
 
 
         void updateZoom()
@@ -107,21 +106,20 @@ namespace Nez.ECS.Components
             if (widthDifferencePercent > 0.8f)
             {
                 //zoom out
-                _currentZoomTarget = -1.0f;
-                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "out");
-              //  _delta = 0;
+                _currentZoomTarget = camera.zoom - 0.5f;
+             //   System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "out");
             }
             else if (widthDifferencePercent < 0.6f)
             {
-                _currentZoomTarget = 1.0f;
-                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "in");
-                // _delta = 0;
+                _currentZoomTarget = camera.zoom + 0.5f;
+                //System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "in");
             }
-            else if (camera.rawZoom >= camera.rawZoom + _currentZoomTarget)
+            else if (widthDifferencePercent >= 0.6f && _currentZoomTarget <= 0.8f)
             {
-                _currentZoomTarget = 0;
+                _currentZoomTarget = camera.zoom;
             }
 
+            
 
         }
 
