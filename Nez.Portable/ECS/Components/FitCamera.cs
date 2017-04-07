@@ -24,7 +24,7 @@ namespace Nez.ECS.Components
 
 
         float zoomStep = .1f;
-        float zoomLerp = .05f;
+        float zoomLerp = .2f;
         float percentBoundary = .4f;
 
         public FitCamera(List<Entity> targetEntities, Camera camera)
@@ -45,7 +45,7 @@ namespace Nez.ECS.Components
             {
                 camera = entity.scene.camera;
                 camera.minimumZoom = 0.1f;
-                camera.maximumZoom = 3f;
+                camera.maximumZoom = 100f;
 
                 _minBoundary = 1.0f - percentBoundary;
                 _maxBoundary = 1.0f + percentBoundary;
@@ -64,6 +64,7 @@ namespace Nez.ECS.Components
         }
 
 
+        float _currentZoomTarget;
 
         void IUpdatable.update()
         {
@@ -73,62 +74,74 @@ namespace Nez.ECS.Components
 
             if (_targetEntities != null)
                 updateFollow();
-
+                
             camera.position = Vector2.Lerp(camera.position, camera.position + _desiredPositionDelta, followLerp);
             camera.entity.transform.roundPosition();
 
 
-            var currentZoom = camera.zoom;
-           
-            //ccheck greater difference in width vs height
-            if (_entityRegion.width > _entityRegion.height)
-            {
-                //adjust width
-                if ((_entityRegion.width / camera.bounds.width) < _minBoundary)
-                {
-                    //in
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + zoomStep, zoomLerp);
-                }
-                else if ((camera.bounds.width / _entityRegion.width) < _maxBoundary)
-                {
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - zoomStep, zoomLerp);
-                }
+            updateZoom(); //1-f^dt
+            camera.rawZoom = MathHelper.Lerp(camera.rawZoom, camera.rawZoom + _currentZoomTarget, Time.deltaTime * 5.5f);
 
-            }
-            else if (_entityRegion.width < _entityRegion.height)
-            {
-                //adjust height
-                if ((_entityRegion.height / camera.bounds.height) < _minBoundary)
-                {
-                    //in
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom + zoomStep, zoomLerp);
-                }
-                else if ((camera.bounds.height / _entityRegion.height) < _maxBoundary)
-                {
-                    camera.zoom = MathHelper.Lerp(camera.zoom, currentZoom - zoomStep, zoomLerp);
-                }
-            }
+            
         }
-       
+
+
+
+
+        float _delta = 0;
+
+
+        void updateZoom()
+        {
+            //float zoomLevel = camera.rawZoom;
+
+            //0 = no zoom
+            //-1 = zoom out
+            //1 = zoom in
+
+           // _currentZoomTarget = 0;
+
+            //this will be between 0% and ???%
+            float widthDifferencePercent = _entityRegion.width / camera.bounds.width;
+            
+            if (widthDifferencePercent > 0.8f)
+            {
+                //zoom out
+                _currentZoomTarget = -1.0f;
+                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "out");
+              //  _delta = 0;
+            }
+            else if (widthDifferencePercent < 0.6f)
+            {
+                _currentZoomTarget = 1.0f;
+                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "in");
+                // _delta = 0;
+            }
+            else if (camera.rawZoom >= camera.rawZoom + _currentZoomTarget)
+            {
+                _currentZoomTarget = 0;
+            }
+
+
+        }
+
+
+
 
         void updateFollow()
         {
             _desiredPositionDelta.X = _desiredPositionDelta.Y = 0;
 
             _entityRegion = findMinMaxRect(_targetEntities.Select(d => d.transform).ToList());
-            Vector2 target = _entityRegion.center;
 
+            var targetX = _entityRegion.center.X;
+            var targetY = _entityRegion.center.Y;
 
-            var targetX = target.X;
-            var targetY = target.Y;
-
-            // x-axis
             if (_worldSpaceDeadzone.x > targetX)
                 _desiredPositionDelta.X = targetX - _worldSpaceDeadzone.x;
             else if (_worldSpaceDeadzone.x < targetX)
                 _desiredPositionDelta.X = targetX - _worldSpaceDeadzone.x;
 
-            // y-axis
             if (_worldSpaceDeadzone.y < targetY)
                 _desiredPositionDelta.Y = targetY - _worldSpaceDeadzone.y;
             else if (_worldSpaceDeadzone.y > targetY)
@@ -140,7 +153,6 @@ namespace Nez.ECS.Components
         public void follow(List<Entity> targetEntities)
         {
             _targetEntities = targetEntities;
-           // var cameraBounds = camera.bounds;
         }
 
 
@@ -173,16 +185,7 @@ namespace Nez.ECS.Components
 
         }
 
-        //private Vector2 findCentroid(RectangleF rect)
-        //{
-        //    Vector2 centroid;
-
-        //    centroid = minPoint + 0.5f * (maxPoint - minPoint);
-
-        //    return centroid;
-        //}
-
-
+      
 
         void onGraphicsDeviceReset()
         {
