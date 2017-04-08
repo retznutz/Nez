@@ -13,19 +13,18 @@ namespace Nez.ECS.Components
 
         public Camera camera;
         public float followLerp = 0.2f;
+        public float zoomBoundaryWidth = 600f;
+        public float zoomBoundaryHeight = 600f;
+        public float zoomSpeed = 5.5f;
 
         List<Entity> _targetEntities;
         Vector2 _desiredPositionDelta;
         RectangleF _worldSpaceDeadzone;
         public Vector2 focusOffset;
         RectangleF _entityRegion;
-        float _minBoundary = 0;
-        float _maxBoundary = 0;
+        float _currentZoomTarget;
 
-
-        float zoomStep = .1f;
-        float zoomLerp = .2f;
-        float percentBoundary = .4f;
+       
 
         public FitCamera(List<Entity> targetEntities, Camera camera)
         {
@@ -44,11 +43,6 @@ namespace Nez.ECS.Components
             if (camera == null)
             {
                 camera = entity.scene.camera;
-                camera.minimumZoom = 0.1f;
-                camera.maximumZoom = 100f;
-
-                _minBoundary = 1.0f - percentBoundary;
-                _maxBoundary = 1.0f + percentBoundary;
             }
 
             follow(_targetEntities);
@@ -64,7 +58,7 @@ namespace Nez.ECS.Components
         }
 
 
-        float _currentZoomTarget;
+        
 
         void IUpdatable.update()
         {
@@ -73,55 +67,33 @@ namespace Nez.ECS.Components
             _worldSpaceDeadzone.y = camera.position.Y + focusOffset.Y;
 
             if (_targetEntities != null)
+            {
                 updateFollow();
-                
+                updateZoom();
+            }
+
             camera.position = Vector2.Lerp(camera.position, camera.position + _desiredPositionDelta, followLerp);
+            camera.zoom = MathHelper.Lerp(camera.zoom, camera.zoom + _currentZoomTarget, Time.deltaTime * zoomSpeed);  //1-f^dt
+
             camera.entity.transform.roundPosition();
-
-
-            updateZoom(); //1-f^dt
-            camera.rawZoom = MathHelper.Lerp(camera.rawZoom, camera.rawZoom + _currentZoomTarget, Time.deltaTime * 5.5f);
-
-            
         }
 
 
 
-
-        float _delta = 0;
-
-
         void updateZoom()
         {
-            //float zoomLevel = camera.rawZoom;
 
-            //0 = no zoom
-            //-1 = zoom out
-            //1 = zoom in
+            float widthDifference = camera.bounds.width - _entityRegion.width - zoomBoundaryWidth;
+            float heightDifference = camera.bounds.height - _entityRegion.height - zoomBoundaryHeight;
 
-           // _currentZoomTarget = 0;
-
-            //this will be between 0% and ???%
-            float widthDifferencePercent = _entityRegion.width / camera.bounds.width;
-            
-            if (widthDifferencePercent > 0.8f)
+            if (widthDifference < heightDifference)
             {
-                //zoom out
-                _currentZoomTarget = -1.0f;
-                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "out");
-              //  _delta = 0;
+                _currentZoomTarget = widthDifference * 0.001f; //scale factor
             }
-            else if (widthDifferencePercent < 0.6f)
+            else
             {
-                _currentZoomTarget = 1.0f;
-                System.Diagnostics.Debug.WriteLine(_currentZoomTarget.ToString() + "in");
-                // _delta = 0;
+                _currentZoomTarget = heightDifference * 0.001f;
             }
-            else if (camera.rawZoom >= camera.rawZoom + _currentZoomTarget)
-            {
-                _currentZoomTarget = 0;
-            }
-
 
         }
 
@@ -180,8 +152,6 @@ namespace Nez.ECS.Components
 
        
             return new RectangleF(minPoint, maxPoint - minPoint);
-
-            
 
         }
 
