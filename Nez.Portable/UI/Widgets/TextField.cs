@@ -446,9 +446,10 @@ namespace Nez.UI
 		}
 
 
-		public void setMaxLength( int maxLength )
+		public TextField setMaxLength( int maxLength )
 		{
 			this.maxLength = maxLength;
+			return this;
 		}
 
 
@@ -464,17 +465,19 @@ namespace Nez.UI
 		/// when typed or pasted.
 		/// </summary>
 		/// <param name="onlyFontChars">If set to <c>true</c> only font chars.</param>
-		public void setOnlyFontChars( bool onlyFontChars )
+		public TextField setOnlyFontChars( bool onlyFontChars )
 		{
 			this.onlyFontChars = onlyFontChars;
+			return this;
 		}
 
 
-		public void setStyle( TextFieldStyle style )
+		public TextField setStyle( TextFieldStyle style )
 		{
 			this.style = style;
 			textHeight = style.font.lineHeight;
 			invalidateHierarchy();
+			return this;
 		}
 
 
@@ -567,7 +570,7 @@ namespace Nez.UI
 		{
 			var font = style.font;
 			var fontColor = ( disabled && style.disabledFontColor.HasValue ) ? style.disabledFontColor.Value
-                : ( ( _isFocused && style.focusedFontColor.HasValue ) ? style.focusedFontColor.Value : style.fontColor );
+				: ( ( _isFocused && style.focusedFontColor.HasValue ) ? style.focusedFontColor.Value : style.fontColor );
 			IDrawable selection = style.selection;
 			IDrawable background = ( disabled && style.disabledBackground != null ) ? style.disabledBackground
 				: ( ( _isFocused && style.focusedBackground != null ) ? style.focusedBackground : style.background );
@@ -587,13 +590,12 @@ namespace Nez.UI
 			}
 
 			var textY = getTextY( font, background );
+			var yOffset = (textY < 0) ? -textY - font.lineHeight/2 + preferredWidth / 2  : 0;
 			calculateOffsets();
 
 			if( _isFocused && hasSelection && selection != null )
-				drawSelection( selection, graphics, font, x + bgLeftWidth, y + textY );
+				drawSelection( selection, graphics, font, x + bgLeftWidth, y + textY + yOffset );
 
-			//float yOffset = font.isFlipped() ? -textHeight : 0;
-			float yOffset = 0;
 			if( displayText.Length == 0 )
 			{
 				if( !_isFocused && messageText != null )
@@ -616,7 +618,7 @@ namespace Nez.UI
 			{
 				blink();
 				if( cursorOn && style.cursor != null )
-					drawCursor( style.cursor, graphics, font, x + bgLeftWidth, y + textY );
+					drawCursor( style.cursor, graphics, font, x + bgLeftWidth, y + textY + yOffset );
 			}
 		}
 
@@ -827,7 +829,7 @@ namespace Nez.UI
 			var minIndex = Math.Min( from, to );
 			var maxIndex = Math.Max( from, to );
 			var newText = ( minIndex > 0 ? text.Substring( 0, minIndex ) : "" )
-			              + ( maxIndex < text.Length ? text.Substring( maxIndex, text.Length - maxIndex ) : "" );
+						  + ( maxIndex < text.Length ? text.Substring( maxIndex, text.Length - maxIndex ) : "" );
 			
 			if( fireChangeEvent )
 				changeText( text, newText );
@@ -887,7 +889,7 @@ namespace Nez.UI
 					if( ( elementCoords.Y < currentCoords.Y || ( elementCoords.Y == currentCoords.Y && elementCoords.X > currentCoords.X ) ) ^ up )
 					{
 						if( best == null
-						    || ( elementCoords.Y > bestCoords.Y || ( elementCoords.Y == bestCoords.Y && elementCoords.X < bestCoords.X ) ) ^ up )
+							|| ( elementCoords.Y > bestCoords.Y || ( elementCoords.Y == bestCoords.Y && elementCoords.X < bestCoords.X ) ) ^ up )
 						{
 							best = (TextField)element;
 							bestCoords = elementCoords;
@@ -954,7 +956,6 @@ namespace Nez.UI
 		/// <summary>
 		/// force sets the text without validating or firing change events. Use at your own risk.
 		/// </summary>
-		/// <returns>The text forced.</returns>
 		/// <param name="str">String.</param>
 		public TextField setTextForced( string str )
 		{
@@ -1074,11 +1075,12 @@ namespace Nez.UI
 		/// Sets the cursor position and clears any selection
 		/// </summary>
 		/// <param name="cursorPosition">Cursor position.</param>
-		public void setCursorPosition( int cursorPosition )
+		public TextField setCursorPosition( int cursorPosition )
 		{
 			Assert.isFalse( cursorPosition < 0, "cursorPosition must be >= 0" );
 			clearSelection();
 			cursor = Math.Min( cursorPosition, text.Length );
+			return this;
 		}
 
 
@@ -1214,11 +1216,12 @@ namespace Nez.UI
 		/// Sets the password character for the text field. The character must be present in the {@link BitmapFont}. Default is 149 (bullet)
 		/// </summary>
 		/// <param name="passwordCharacter">Password character.</param>
-		public void setPasswordCharacter( char passwordCharacter )
+		public TextField setPasswordCharacter( char passwordCharacter )
 		{
 			this.passwordCharacter = passwordCharacter;
 			if( passwordMode )
 				updateDisplayText();
+			return this;
 		}
 
 
