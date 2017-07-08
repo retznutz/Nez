@@ -215,7 +215,7 @@ namespace Nez
 		/// <param name="deadzone">Deadzone.</param>
 		public bool isLeftStickUpPressed( float deadzone = Input.DEFAULT_DEADZONE )
 		{
-			return _currentState.ThumbSticks.Left.Y < deadzone && _previousState.ThumbSticks.Left.Y > deadzone;
+			return _currentState.ThumbSticks.Left.Y > deadzone && _previousState.ThumbSticks.Left.Y < deadzone;
 		}
 
 
